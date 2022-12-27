@@ -220,5 +220,4 @@ testem.log
 Thumbs.db
 
 
-src/assets/series/*
-!src/assets/series/.gitkeep
+task.db
