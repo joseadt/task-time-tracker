@@ -220,4 +220,4 @@ testem.log
 Thumbs.db
 
 
-task.db
+task.db*
