@@ -34,7 +34,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def search_tasks(self):
         with TaskRepository() as repo:
             self.ui.taskList.clear()
-            self._load_tasks(repo, self.taskSearchEdit.text())
+            self._load_tasks(repo, self.ui.taskSearchEdit.text())
         
     def save_task(self):
         with TaskRepository() as repo:
@@ -45,7 +45,7 @@ class MainWindow(QtWidgets.QMainWindow):
             
     def _load_tasks(self, repo: TaskRepository, filter: str = None):
         for task in repo.get_all_tasks(filter):
-                self.ui.taskList.addItem(TaskListItem(self.taskList, task.id, task.title, task.complete))
+                self.ui.taskList.addItem(TaskListItem(self.ui.taskList, task.id, task.title, task.complete))
     
     def add_task(self):
         with TaskRepository() as repo:
@@ -53,16 +53,16 @@ class MainWindow(QtWidgets.QMainWindow):
             id= repo.save_task(task)
             task.id = id
             self.task.set_data(task)
-            self.taskList.clear()
+            self.ui.taskList.clear()
             self._load_tasks(repo)
 
 class EditableTask(Task):
     
     def __init__(self, ui: Ui_MainWindow, task = Task()):
         super().__init__(task.id, task.title, task.description, task.complete, task.steps, task.events, task.creation_date)
-        self.titleField: QtWidgets.QLineEdit = ui.taskTitleEdit
+        self.titleField= ui.taskTitleEdit
         self.titleField.setPlaceholderText("Task title...")
-        self.descField: QtWidgets.QTextEdit = ui.taskDescEdit
+        self.descField = ui.taskDescEdit
         self.descField.setPlaceholderText("Description...")
         self.taskCompleteField: QtWidgets.QRadioButton =  ui.taskComplete
         
