@@ -29,7 +29,9 @@ class TaskRepository(object):
             params.append(task.id)
         else:
             query = "INSERT INTO task(title, description, complete) VALUES (?, ? ,?)"
-        self.con.execute(query, params)
+        res = self.con.execute(query, params)
+        return res.lastrowid
+        
 
     def get_task(self, id, fetchAll=True):
         res = self.con.execute("SELECT * FROM task t WHERE t.id = ?", [id])

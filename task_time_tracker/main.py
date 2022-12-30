@@ -4,22 +4,26 @@ from PyQt6 import QtCore, QtGui, QtWidgets, uic
 
 from .model.entities import Step, Task, TaskEvent
 from .model.repository import TaskRepository
+from .ui.ui_main import Ui_MainWindow
 
 
-class Ui(QtWidgets.QMainWindow):
+class MainWindow(QtWidgets.QMainWindow):
+    
     def __init__(self):
-        super(Ui, self).__init__()
-        uic.loadUi('main.ui', self)
-        self.show()
-        self.task = EditableTask(self)
-        self.taskSearchEdit: QtWidgets.QLineEdit
-        self.taskSaveButton: QtWidgets.QPushButton
-        self.taskSearchEdit.setPlaceholderText("Search task")
-        self.taskSearchEdit.textEdited.connect(self.search_tasks)
-        self.taskSaveButton.clicked.connect(self.save_task)
-        self.taskList.itemClicked.connect(self.task_item_clicked)
+        super(MainWindow, self).__init__()
+        self.ui = Ui_MainWindow()
+        self.ui.setupUi(self)
+        self.task = EditableTask(self.ui)
+        self.ui.taskSearchEdit.setPlaceholderText("Search task")
+        self.ui.taskSearchEdit.textEdited.connect(self.search_tasks)
+        self.ui.taskSaveButton.clicked.connect(self.save_task)
+        self.ui.taskList.itemClicked.connect(self.task_item_clicked)
+        self.ui.addTaskButton.clicked.connect(self.add_task)
         with TaskRepository() as repo:
             self._load_tasks(repo)
+            item = self.ui.taskList.item(0)
+            if item:
+                self.task.set_data(repo.get_task(item.id))
     
     def task_item_clicked(self, task_item):
         if(isinstance(task_item, TaskListItem)):
@@ -29,29 +33,32 @@ class Ui(QtWidgets.QMainWindow):
     
     def search_tasks(self):
         with TaskRepository() as repo:
-            self.taskList.clear()
+            self.ui.taskList.clear()
             self._load_tasks(repo, self.taskSearchEdit.text())
         
     def save_task(self):
         with TaskRepository() as repo:
-            repo.save_task(self.task.transform())
-            self.taskList: QtWidgets.QListWidget
-            self.taskList.clear()
+            id = repo.save_task(self.task.transform())
+            self.task.id = id
+            self.ui.taskList.clear()
             self._load_tasks(repo)
-            self.task.clear()
             
     def _load_tasks(self, repo: TaskRepository, filter: str = None):
-        first = True
         for task in repo.get_all_tasks(filter):
-                if first:
-                    self.task.set_data(repo.get_task(task.id))
-                    first = False
-                self.taskList.addItem(TaskListItem(self.taskList, task.id, task.title, task.complete))
-
+                self.ui.taskList.addItem(TaskListItem(self.taskList, task.id, task.title, task.complete))
+    
+    def add_task(self):
+        with TaskRepository() as repo:
+            task = Task(title= "New task", description="")
+            id= repo.save_task(task)
+            task.id = id
+            self.task.set_data(task)
+            self.taskList.clear()
+            self._load_tasks(repo)
 
 class EditableTask(Task):
     
-    def __init__(self, ui: Ui, task = Task()):
+    def __init__(self, ui: Ui_MainWindow, task = Task()):
         super().__init__(task.id, task.title, task.description, task.complete, task.steps, task.events, task.creation_date)
         self.titleField: QtWidgets.QLineEdit = ui.taskTitleEdit
         self.titleField.setPlaceholderText("Task title...")
@@ -76,6 +83,8 @@ class EditableTask(Task):
         self.descField.setText(task.description)
         self.taskCompleteField.setChecked(task.complete)
         
+    
+        
         
         
 class TaskListItem(QtWidgets.QListWidgetItem):
@@ -93,7 +102,8 @@ def start():
     with open('styles.qss', 'r') as file:
         styles = file.read()
         app.setStyleSheet(styles)
-    window = Ui()
+    window = MainWindow()
+    window.show()
     app.exec()
     
 
