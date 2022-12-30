@@ -1,6 +1,6 @@
 import sys
 
-from PyQt6 import QtWidgets, uic
+from PyQt6 import QtCore, QtGui, QtWidgets, uic
 
 from .model.entities import Step, Task, TaskEvent
 from .model.repository import TaskRepository
@@ -14,6 +14,7 @@ class Ui(QtWidgets.QMainWindow):
         self.task = EditableTask(self)
         self.taskSearchEdit: QtWidgets.QLineEdit
         self.taskSaveButton: QtWidgets.QPushButton
+        self.taskSearchEdit.setPlaceholderText("Search task")
         self.taskSearchEdit.textEdited.connect(self.search_tasks)
         self.taskSaveButton.clicked.connect(self.save_task)
         self.taskList.itemClicked.connect(self.task_item_clicked)
@@ -40,7 +41,11 @@ class Ui(QtWidgets.QMainWindow):
             self.task.clear()
             
     def _load_tasks(self, repo: TaskRepository, filter: str = None):
+        first = True
         for task in repo.get_all_tasks(filter):
+                if first:
+                    self.task.set_data(repo.get_task(task.id))
+                    first = False
                 self.taskList.addItem(TaskListItem(self.taskList, task.id, task.title, task.complete))
 
 
@@ -49,7 +54,9 @@ class EditableTask(Task):
     def __init__(self, ui: Ui, task = Task()):
         super().__init__(task.id, task.title, task.description, task.complete, task.steps, task.events, task.creation_date)
         self.titleField: QtWidgets.QLineEdit = ui.taskTitleEdit
+        self.titleField.setPlaceholderText("Task title...")
         self.descField: QtWidgets.QTextEdit = ui.taskDescEdit
+        self.descField.setPlaceholderText("Description...")
         self.taskCompleteField: QtWidgets.QRadioButton =  ui.taskComplete
         
     def transform(self) -> Task:
@@ -74,8 +81,7 @@ class EditableTask(Task):
 class TaskListItem(QtWidgets.QListWidgetItem):
     
     def __init__(self, taskList: QtWidgets.QListWidget, id: int, text, complete = False):
-        super().__init__(taskList)
-        self.setText(text)
+        super().__init__(text, taskList)
         self.id = id
         f = self.font()
         f.setStrikeOut(complete)
@@ -83,6 +89,7 @@ class TaskListItem(QtWidgets.QListWidgetItem):
 
 def start():
     app = QtWidgets.QApplication(sys.argv)
+    QtCore.QDir.addSearchPath("icons", "./assets")
     with open('styles.qss', 'r') as file:
         styles = file.read()
         app.setStyleSheet(styles)

@@ -44,6 +44,7 @@ class TaskRepository(object):
         if(filter):
             query += "AND t.title LIKE ? "
             params.append('%' + filter + '%')
+        query += "ORDER BY creation_date DESC "
         res = self.con.execute(query, params)
         rows = res.fetchall()
         return list(map(lambda r: task_row_mapper(r), rows))

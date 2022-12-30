@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1040</width>
+    <width>1068</width>
     <height>698</height>
    </rect>
   </property>
@@ -81,6 +81,15 @@
           <width>100</width>
           <height>40</height>
          </size>
+        </property>
+        <property name="font">
+         <font>
+          <family>Calibri</family>
+          <pointsize>11</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+          <kerning>true</kerning>
+         </font>
         </property>
         <property name="styleSheet">
          <string notr="true"/>

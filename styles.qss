@@ -6,14 +6,8 @@ QMainWindow {
 
 #listSeparator {
     border: none;
-    background: #303233;
+    background: rgb(109, 109, 109);
 }
-
-
-QRadioButton::indicator:checked {
-    background-color: red
-}
-
 
 QMainWindow * {
     border-radius: 20px;
@@ -22,20 +16,51 @@ QMainWindow * {
     font-family: Calibri, sans-serif
 }
 
-QListWidget, QTextEdit, QLineEdit, QPushButton {
-    background-color: rgb(90, 90, 90);
+QListWidget {
+    background-color: #353739;
     padding: 10px;
     margin: 5px;
     border: 2px solid rgb(197, 197, 197);
 }
 
-QPushButton {
-    height: 20px;
-    width: 40px;
-    border: 2px solid rgb(197, 197, 197);
-    border-radius: 10px;
-    border-style: outset;
-    padding: 5px;
+QTextEdit,
+QLineEdit {
+    background-color: rgb(90, 90, 90);
+    padding: 10px;
+    margin: 5px;
+    border: 2px solid rgb(165, 165, 165);
 }
 
 
+
+QPushButton::hover {
+    background-color: rgb(159, 159, 159);
+}
+
+QPushButton {
+    background-color: #68d4ab;
+    height: 20px;
+    width: 40px;
+    color: rgb(50, 50, 50);
+    border: 2px solid #54ad8b;
+    border-radius: 10px;
+    border-style: outset;
+    padding: 5px;
+    margin: 5px;
+    font-weight: bold;
+}
+
+
+QRadioButton::indicator {
+    width: 20px;
+    height: 20px;
+}
+
+QRadioButton::indicator::unchecked {
+    image: url(icons:radio-button-unchecked.png);
+}
+
+
+QRadioButton::indicator::checked {
+    image: url(icons:radio-button-checked.png);
+}
