@@ -15,5 +15,5 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
-start = "task_time_tracker.main:start"
+start = "task_time_tracker.scripts:start"
 compile_ui = "task_time_tracker.scripts:compile_ui"
