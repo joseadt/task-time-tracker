@@ -1,4 +1,6 @@
 import sys
+from types import NoneType
+from typing import Optional
 
 from PyQt6 import QtCore, QtGui, QtWidgets, uic
 
@@ -13,10 +15,9 @@ class MainWindow(QtWidgets.QMainWindow):
         super(MainWindow, self).__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        self.task = EditableTask(self.ui)
+        self.task = EditableTask(self.ui, self.save_task)
         self.ui.taskSearchEdit.setPlaceholderText("Search task")
         self.ui.taskSearchEdit.textEdited.connect(self.search_tasks)
-        self.ui.taskSaveButton.clicked.connect(self.save_task)
         self.ui.taskList.itemClicked.connect(self.task_item_clicked)
         self.ui.addTaskButton.clicked.connect(self.add_task)
         with TaskRepository() as repo:
@@ -33,39 +34,49 @@ class MainWindow(QtWidgets.QMainWindow):
     
     def search_tasks(self):
         with TaskRepository() as repo:
-            self.ui.taskList.clear()
             self._load_tasks(repo, self.ui.taskSearchEdit.text())
         
-    def save_task(self):
+    def save_task(self, task = None):
+        task = task if task != None else self.task
         with TaskRepository() as repo:
-            id = repo.save_task(self.task.transform())
-            self.task.id = id
-            self.ui.taskList.clear()
+            task = repo.save_task(self.task.transform())
+            self.task.set_data(task)
             self._load_tasks(repo)
             
-    def _load_tasks(self, repo: TaskRepository, filter: str = None):
+    def _load_tasks(self, repo: TaskRepository, filter: Optional[str] = None):
+        self.ui.taskList.clear()
         for task in repo.get_all_tasks(filter):
                 self.ui.taskList.addItem(TaskListItem(self.ui.taskList, task.id, task.title, task.complete))
     
     def add_task(self):
-        with TaskRepository() as repo:
-            task = Task(title= "New task", description="")
-            id= repo.save_task(task)
-            task.id = id
-            self.task.set_data(task)
-            self.ui.taskList.clear()
-            self._load_tasks(repo)
-
+        self.save_task(Task(title= "New task", description=""))
+        
+        
 class EditableTask(Task):
     
-    def __init__(self, ui: Ui_MainWindow, task = Task()):
+    def __init__(self, ui: Ui_MainWindow, onEdit = None, task = Task()):
         super().__init__(task.id, task.title, task.description, task.complete, task.steps, task.events, task.creation_date)
         self.titleField= ui.taskTitleEdit
-        self.titleField.setPlaceholderText("Task title...")
         self.descField = ui.taskDescEdit
+        self.titleField.setPlaceholderText("Task title...")
         self.descField.setPlaceholderText("Description...")
-        self.taskCompleteField: QtWidgets.QRadioButton =  ui.taskComplete
         
+        self.taskCompleteField =  ui.taskComplete
+        self.taskCompleteField.clicked.connect(self.update_task)
+        
+        self.debounce = QtCore.QTimer()
+        self.debounce.setInterval(500)
+        self.debounce.setSingleShot(True)
+        self.debounce.timeout.connect(self.update_task)
+        self.descField.textChanged.connect(self.debounce.start)
+        self.titleField.textChanged.connect(self.debounce.start)
+        self.reloadTask = onEdit
+        
+        
+    def update_task(self):
+        if self.reloadTask != None:
+            self.reloadTask()
+    
     def transform(self) -> Task:
         self.title = self.titleField.text()
         self.description = self.descField.toPlainText()
@@ -83,14 +94,11 @@ class EditableTask(Task):
         self.descField.setText(task.description)
         self.taskCompleteField.setChecked(task.complete)
         
-    
-        
-        
         
 class TaskListItem(QtWidgets.QListWidgetItem):
     
     def __init__(self, taskList: QtWidgets.QListWidget, id: int, text, complete = False):
-        super().__init__(text, taskList)
+        super().__init__('> ' + text, taskList)
         self.id = id
         f = self.font()
         f.setStrikeOut(complete)

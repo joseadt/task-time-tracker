@@ -1,3 +1,5 @@
+from typing import Optional
+
 from .db import *
 
 
@@ -24,13 +26,16 @@ class TaskRepository(object):
     def save_task(self, task: Task):
         params = [task.title, task.description, task.complete]
         query = None
-        if(task.id):
+        update = task.id != None
+        if(update):
             query = "UPDATE task SET title=?, description= ?, complete= ? WHERE id = ?"
             params.append(task.id)
         else:
             query = "INSERT INTO task(title, description, complete) VALUES (?, ? ,?)"
         res = self.con.execute(query, params)
-        return res.lastrowid
+        if(not update):
+            task.id = res.lastrowid
+        return task
         
 
     def get_task(self, id, fetchAll=True):
@@ -40,7 +45,7 @@ class TaskRepository(object):
         events = self.get_task_events(id) if fetchAll else None
         return task_row_mapper(row, steps, events)
 
-    def get_all_tasks(self, filter: str = None, fetchAll = False) -> list[Task]:
+    def get_all_tasks(self, filter: Optional[str] = None, fetchAll = False) -> list[Task]:
         query = "SELECT * FROM task t WHERE 1=1 "
         params = []
         if(filter):
@@ -69,7 +74,7 @@ class TaskRepository(object):
         rows = self.con.execute(query, params).fetchall()
         return list(map(lambda r: step_row_mapper(r), rows))
 
-    def get_task_events(self, task_id=None):
+    def get_task_events(self, task_id: Optional[int]=None):
         query = "SELECT * FROM task_event te WHERE 1=1 "
         params = []
         if(task_id):
@@ -77,3 +82,7 @@ class TaskRepository(object):
             params.append(task_id)
         rows = self.con.execute(query, params).fetchall()
         return list(map(lambda r: task_event_row_mapper(r), rows))
+    
+    def delete_task(self, id: int):
+        query = "DELETE FROM task WHERE id = ?"
+        self.con.execute(query, [id])
