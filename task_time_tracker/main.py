@@ -23,6 +23,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self._load_tasks(repo)
             item = self.ui.taskList.item(0)
             if item:
+                self.ui.taskList.setCurrentItem(item)
                 self.task.set_data(repo.get_task(item.id))
     
     def task_item_clicked(self, task_item):
