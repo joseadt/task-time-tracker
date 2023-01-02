@@ -10,6 +10,16 @@
             "problemMatcher": []
         },
         {
+            "label": "compile ui",
+            "type": "shell",
+            "command": "poetry run compile_ui",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
             "label": "poetry install",
             "type": "shell",
             "command": "poetry install"
