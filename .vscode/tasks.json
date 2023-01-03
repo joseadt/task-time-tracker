@@ -7,12 +7,13 @@
             "label": "poetry run",
             "type": "shell",
             "command": "poetry run start",
-            "problemMatcher": []
+            "problemMatcher": [],
+            "dependsOn": ["compile ui"]
         },
         {
             "label": "compile ui",
             "type": "shell",
-            "command": "poetry run compile_ui",
+            "command": "poetry run pyuic6 task_time_tracker/ui/main.ui -o task_time_tracker/ui/ui_main.py",
             "problemMatcher": [],
             "group": {
                 "kind": "build",
