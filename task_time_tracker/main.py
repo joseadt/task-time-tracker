@@ -137,6 +137,7 @@ def start():
         styles = file.read()
         app.setStyleSheet(styles)
     window = MainWindow()
+    window.setWindowTitle("Tímamælir")
     window.show()
     app.exec()
     

@@ -100,4 +100,19 @@ QScrollBar::sub-line:vertical {
     subcontrol-position: top;
     subcontrol-origin: margin;
 }
+
+QPushButton[remove=true] {
+    color: #f5f5f5;
+    background-color: #ff4d4d;
+    border: 0px;
+    width: 20px;
+}
+
+QPushButton[remove=true]:hover {
+    background-color: #ff7878;
+}
+
+QPushButton[remove=true]:pressed {
+    background-color: #ff1c1c;
+}
     
