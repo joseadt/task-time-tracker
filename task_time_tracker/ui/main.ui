@@ -237,6 +237,28 @@
     </item>
    </layout>
   </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1068</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="exportToCSV"/>
+   </widget>
+   <addaction name="menuFile"/>
+  </widget>
+  <action name="exportToCSV">
+   <property name="text">
+    <string>Export to CSV</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

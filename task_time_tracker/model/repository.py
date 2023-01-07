@@ -54,7 +54,13 @@ class TaskRepository(object):
         query += "ORDER BY creation_date DESC "
         res = self.con.execute(query, params)
         rows = res.fetchall()
-        return list(map(lambda r: task_row_mapper(r), rows))
+        result = list(map(lambda r: task_row_mapper(r), rows))
+        if fetchAll:
+            for task in result:
+                task.events = self.get_task_events(task.id)
+                task.steps = self.get_steps(task.id)
+        
+        return result
 
     def get_step(self, id):
         res = self.con.execute("SELECT id, title, complete, task_id FROM step s WHERE s.id = ?", [id])

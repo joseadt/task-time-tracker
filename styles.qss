@@ -32,9 +32,34 @@ QListWidget::item:selected
     background: #888888;
 }
 
+QMenuBar {
+    background-color: #5A5A5A;
+}
+
+
+QMenuBar::item:selected {
+    background-color: #2D2D2D;
+}
+QMenuBar::item:hover {
+    background-color: #2D2D2D;
+}
+
+QMenu::item:selected {
+    background-color: #555555;
+}
+
+QMenu {
+    background-color: #5A5A5A;
+}
+
+QAction:hover,
+QMenu::item:hover {
+    background-color: #2D2D2D;
+}
+
 QTextEdit,
 QLineEdit {
-    background-color: rgb(90, 90, 90);
+    background-color: #5A5A5A;
     padding: 10px;
     margin: 5px;
     border: 2px solid rgb(165, 165, 165);

@@ -1,9 +1,10 @@
+import csv
 import sys
 from typing import Optional, Tuple
 
 from PyQt6 import QtCore, QtWidgets
 
-from .model.entities import Step, Task, TaskEvent, event_start, event_stop
+from .model.entities import Task, TaskEvent, event_start, event_stop
 from .model.repository import TaskRepository
 from .ui.ui_main import Ui_MainWindow
 
@@ -19,6 +20,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.taskSearchEdit.textEdited.connect(self.search_tasks)
         self.ui.taskList.itemClicked.connect(self.task_item_clicked)
         self.ui.addTaskButton.clicked.connect(self.add_task)
+        self.ui.exportToCSV.triggered.connect(self.save_csv)
         with TaskRepository() as repo:
             self._load_tasks(repo)
             item = self.ui.taskList.item(0)
@@ -50,6 +52,21 @@ class MainWindow(QtWidgets.QMainWindow):
     
     def add_task(self):
         self.save_task(Task(title= "New task", description=""))
+        
+    def save_csv(self):
+        file_name, _ = QtWidgets.QFileDialog.getSaveFileName(self, 'Export to csv', filter= 'CSV Files (*.csv);;All Files (*)')
+        if file_name:
+            with TaskRepository() as repo, open(file_name, 'w', newline='') as f:
+                writer = csv.writer(f)
+                tasks = repo.get_all_tasks(fetchAll= True)
+                writer.writerow(['ID', 'TITLE','STATUS', 'TOTAL TIME', 'EVENT', 'DATE'])
+                for task in tasks:
+                    task_status = 'Completed' if task.complete else 'On going'
+                    for event in task.events:
+                        event_type = 'START' if event.event == event_start else 'STOP'
+                        writer.writerow([task.id, task.title, task_status, task.calculate_time() , event_type, event.date])
+                        
+                
         
         
 class EditableTask(Task):
